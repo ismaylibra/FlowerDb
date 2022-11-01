@@ -9,5 +9,6 @@
         public string? ImageUrl { get; set; }
         public string? Content { get; set; }
         public Category? Category { get; set; }
+        public int Discount { get; set; }
     }
 }

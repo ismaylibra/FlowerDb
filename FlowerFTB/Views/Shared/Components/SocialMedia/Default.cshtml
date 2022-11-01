@@ -1,0 +1,14 @@
+﻿@{
+    List<SocialMedia> socialMedias = Model;
+}
+<div class="item">
+    <h6>SOCIAL MEDIA</h6>
+    <ul class="list-unstyled mt-4">
+        @foreach (var social in socialMedias)
+        {
+            <li><a class="text-black-50" href="@social.SocialMediaUrl" target="_blank">@social.Name</a></li>
+        }
+        
+       
+    </ul>
+</div>
