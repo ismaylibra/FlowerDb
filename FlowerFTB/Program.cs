@@ -1,4 +1,5 @@
 using FlowerFTB.DAL;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -14,17 +15,27 @@ namespace FlowerFTB
             var app = builder.Build();
 
             app.UseStaticFiles();
-          //  app.UseEndpoints(endpoints =>
-          //  {
-          //      endpoints.MapControllerRoute(
-          //  name: "areas",
-          //  pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
-          //);
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>{
+                endpoints.MapControllerRoute(
+
+                name: "areas",
+                pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
                 app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            });
+
+
+             
+              
+              
+                
             
+           
 
 
 
