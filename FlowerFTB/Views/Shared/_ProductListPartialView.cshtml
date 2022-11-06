@@ -1,0 +1,9 @@
+﻿@model List<Product>
+@{
+    var products = Model;
+}
+
+@foreach (var product in products)
+{
+    @await Html.PartialAsync("_ProductItemPartialView", product)
+}

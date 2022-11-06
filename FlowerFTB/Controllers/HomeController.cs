@@ -27,5 +27,12 @@ namespace FlowerFTB.Controllers
             };
             return View(hvmodel);
         }
+
+        public IActionResult Search(string searchText)
+        {
+            var products = _dbContext.Products.Where(x=> x.Name.ToLower().Contains(searchText)).ToList();
+            return PartialView("_SearchProductPartialView", products);
+        }
     }
+       
 }
