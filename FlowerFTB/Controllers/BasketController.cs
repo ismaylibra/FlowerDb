@@ -13,11 +13,10 @@ namespace FlowerFTB.Controllers
         {
             _dbContext = dbContext;
         }
-        public async Task<IActionResult> Index(int? productId)
+        public async Task<IActionResult> Index()
         {
-            var basketItems = Request.Cookies["basket"];
-            return Ok(JsonConvert.DeserializeObject<List<BasketItemViewModel>>(basketItems));
-            return PartialView(basketItems);
+            var basketItems = GetBasketItems();
+            return View(basketItems);
         }
         public async Task<IActionResult> AddToBasket(int? productId)
         {
@@ -60,9 +59,26 @@ namespace FlowerFTB.Controllers
                 }
 
             }
+            CookieOptions option = new CookieOptions();
+            option.Expires = DateTime.Now.AddYears(1);
+            Response.Cookies.Append("basket", JsonConvert.SerializeObject(basketItems), option);
             Response.Cookies.Append("basket", JsonConvert.SerializeObject(basketItems));
             return Ok();
 
         }
+        public async Task<IActionResult> GetBasketCount()
+        {
+            var basketItems = GetBasketItems();
+            return Ok(basketItems.Count);
+        }
+        private List<BasketItemViewModel> GetBasketItems()
+        {
+            var basket = Request.Cookies["basket"];
+            var basketItems = basket is not null
+                    ? JsonConvert.DeserializeObject<List<BasketItemViewModel>>(basket)
+                    : new List<BasketItemViewModel>();
+            return basketItems;
+        }
+
     }
 }
