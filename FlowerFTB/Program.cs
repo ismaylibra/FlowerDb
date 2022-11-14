@@ -1,4 +1,6 @@
 using FlowerFTB.DAL;
+using FlowerFTB.Models.IdentityModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,12 +14,28 @@ namespace FlowerFTB
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddMvc();
             builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddIdentity<User, IdentityRole>(opt =>
+            {
+                opt.SignIn.RequireConfirmedEmail = true;
+
+                opt.User.RequireUniqueEmail = true;
+
+                opt.Password.RequiredLength = 6;
+
+                opt.Password.RequireUppercase = false;
+
+                opt.Password.RequireLowercase = false;
+            })
+                 .AddEntityFrameworkStores<AppDbContext>()
+                 .AddDefaultTokenProviders();
             var app = builder.Build();
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication();
 
-            app.UseEndpoints(endpoints =>{
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllerRoute(
 
                 name: "areas",
@@ -30,12 +48,12 @@ namespace FlowerFTB
             });
 
 
-             
-              
-              
-                
-            
-           
+
+
+
+
+
+
 
 
 

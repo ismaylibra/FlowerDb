@@ -135,6 +135,7 @@
                                     </ul>
                                 </li>
                                 <li class="nav-item">
+
                                     <a class="nav-link" href="#">Elements</a>
                                     <ul class="list-unstyled py-3 elements">
                                         <li class=""><a class="px-1" href="">Element 1</a></li>
@@ -149,6 +150,19 @@
                                             </ul>
                                         </li>
                                     </ul>
+                                </li>
+                                <li> 
+                                    @if(User.Identity.IsAuthenticated){
+
+                                    <a><i class="fa-solid fa-user" style="font-size: 20px;"></i>
+                                        <br>
+                                        @User.Identity.Name
+                                        </a>
+                                    <a asp-controller="account" asp-action="logout" >Logout</a>
+                                    }
+                                    else{
+                                        <a asp-controller="account" asp-action="register">Register</a>
+                                    }
                                 </li>
                                 <li class="nav-item my-auto search">
                                     <i class="fas fa-search" id="search"></i>
