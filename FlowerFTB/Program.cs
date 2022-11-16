@@ -1,5 +1,7 @@
 using FlowerFTB.DAL;
+using FlowerFTB.Data;
 using FlowerFTB.Models.IdentityModels;
+using FlowerFTB.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +31,8 @@ namespace FlowerFTB
             })
                  .AddEntityFrameworkStores<AppDbContext>()
                  .AddDefaultTokenProviders();
-            //builder.Configuration.GetSection("MailSettings")
-            // .Get<EmailConfiguration>();
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+            builder.Services.AddTransient<IMailService, MailManager>();
             var app = builder.Build();
 
             app.UseStaticFiles();
