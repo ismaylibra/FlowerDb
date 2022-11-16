@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Configuration;
 
 namespace FlowerFTB
 {
@@ -16,7 +17,7 @@ namespace FlowerFTB
             builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddIdentity<User, IdentityRole>(opt =>
             {
-                opt.SignIn.RequireConfirmedEmail = true;
+                opt.SignIn.RequireConfirmedEmail = false;
 
                 opt.User.RequireUniqueEmail = true;
 
@@ -28,6 +29,8 @@ namespace FlowerFTB
             })
                  .AddEntityFrameworkStores<AppDbContext>()
                  .AddDefaultTokenProviders();
+            //builder.Configuration.GetSection("MailSettings")
+            // .Get<EmailConfiguration>();
             var app = builder.Build();
 
             app.UseStaticFiles();

@@ -25,14 +25,14 @@ namespace FlowerFTB.Controllers
 
         public IActionResult Register()
         {
-           
+
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return View();
 
             var existUser = await _userManager.FindByNameAsync(model.Username);
@@ -78,21 +78,77 @@ namespace FlowerFTB.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User
+
+                var existUser = await _userManager.FindByNameAsync(model.Username);
+
+                if (existUser == null)
                 {
-                    UserName = model.Username
-                };
-                var result = await _signInManager.PasswordSignInAsync(user, model.Password, false,true);
-                if (!result.Succeeded)
-                {
-                    ModelState.AddModelError("", "Username və ya Password yanlışdır..!");
+                    ModelState.AddModelError("", "Username isnot correct");
                     return View();
                 }
-                return RedirectToAction(nameof(Index), "Home");
+
+                var result = await _signInManager.PasswordSignInAsync(existUser, model.Password, false, true);
+
+                if (result.IsNotAllowed)
+                {
+                    ModelState.AddModelError("", "Email tesdiqlenmelidir");
+                    return View();
+                }
+
+              
+
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "Invalid credentials");
+                    return View();
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Index), "Home");
+        }
+
+        public IActionResult ChangePassword()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(nameof(Login));
+            };
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (user is null) return BadRequest();
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("",error.Description);
+                }
+                return View();
 
             }
-            return View();
-
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Login));
         }
 
     }
