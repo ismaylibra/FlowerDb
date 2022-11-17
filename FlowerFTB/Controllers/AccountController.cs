@@ -1,7 +1,10 @@
-﻿using FlowerFTB.Models.IdentityModels;
+﻿using FlowerFTB.Data;
+using FlowerFTB.Models.IdentityModels;
+using FlowerFTB.Services;
 using FlowerFTB.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FlowerFTB.Controllers
 {
@@ -10,11 +13,13 @@ namespace FlowerFTB.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IMailService _mailManager;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IMailService mailService)
         {
             this._userManager = userManager;
             this._signInManager = signInManager;
+            _mailManager = mailService;
         }
 
 
@@ -149,6 +154,73 @@ namespace FlowerFTB.Controllers
             }
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
+        }
+        
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Email  daxil edilməlidir..!");
+                return View();
+            }
+
+            var existUser = await _userManager.FindByEmailAsync(model.Email);
+
+            if(existUser is null)
+            {
+                ModelState.AddModelError("", "Belə email mövcud deyil..!");
+                return View();
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(existUser);
+            var resetLink = Url.Action(nameof(ResetPassword), "Account", new {email = model.Email,token},Request.Scheme,Request.Host.ToString());
+            var mailRequest = new RequestEmail
+            {
+                ToEmail = model.Email,
+                Body = resetLink,
+                Subject = "Reset Link"
+            };
+
+          await  _mailManager.SendEmailAsync(mailRequest);
+            return RedirectToAction(nameof(Login));
+        }
+        public IActionResult ResetPassword(string email, string token)
+        {
+            return View(new ResetPasswordViewModel
+            {
+                Email = email,  
+                Token = token
+            });
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Düzgün doldurulmalıdır..!");
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null) return BadRequest();
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+            if (result.Succeeded)
+             {
+                return RedirectToAction(nameof(Login));
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+            return View();
         }
 
     }

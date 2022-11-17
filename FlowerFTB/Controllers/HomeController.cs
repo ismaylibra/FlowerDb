@@ -18,7 +18,7 @@ namespace FlowerFTB.Controllers
         }
         public async  Task<IActionResult> Index()
         {
-           await _mailService.SendEmailAsync(new Data.RequestEmail { Body = "Hello", ToEmail = "ismayiliib@code.edu.az", Subject = "For Test" });
+           //await _mailService.SendEmailAsync(new Data.RequestEmail { Body = "Hello", ToEmail = "ismayiliib@code.edu.az", Subject = "For Test" });
             Response.Cookies.Append("cookie", "Test", new CookieOptions { Expires = DateTimeOffset.Now.AddHours(1) });
             var sliderImages = await _dbContext.SliderImages.ToListAsync();
             var slider = await _dbContext.Sliders.SingleOrDefaultAsync();
