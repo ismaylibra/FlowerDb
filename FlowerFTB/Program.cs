@@ -2,6 +2,7 @@ using FlowerFTB.DAL;
 using FlowerFTB.Data;
 using FlowerFTB.Models.IdentityModels;
 using FlowerFTB.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,16 @@ namespace FlowerFTB
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddTransient<IMailService, MailManager>();
             var app = builder.Build();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();    
+            }
+            else
+            {
+                app.UseExceptionHandler("/ErrorPage");
+            }
+            app.UseStatusCodePagesWithReExecute("/ErrorPage/ErrorAction", "?code={0}");
 
             app.UseStaticFiles();
             app.UseRouting();
